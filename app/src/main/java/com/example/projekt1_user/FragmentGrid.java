@@ -21,13 +21,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.projekt1_user.R;
-
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FragmentGrid extends Fragment {
     private RecyclerView recyclerView;
     private com.example.projekt1_user.GridAdapter gridAdapter;
     private ArrayList<String> gridDataList = new ArrayList<>();
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mReferenceTasks,mReferenceTasks2;
+    private List<String> tasks=new ArrayList<>();
+    private List<String> tasks2=new ArrayList<>();
+    public static final String SHARED_PREFS="sharedPrefs";
 
     private Context context;
 
@@ -36,6 +49,9 @@ public class FragmentGrid extends Fragment {
 
         super.onCreate(savedInstanceState);
         context = getActivity();
+        mDatabase=FirebaseDatabase.getInstance();
+        mReferenceTasks=mDatabase.getReference("task");
+        mReferenceTasks2=mDatabase.getReference("vote");
     }
     @Nullable
     @Override
@@ -44,17 +60,19 @@ public class FragmentGrid extends Fragment {
 
         //db and active user
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        String name = sharedPref.getString(getString(R.string.active_user),"Active user");
+        //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        //String name = sharedPref.getString(getString(R.string.active_user),"Active user");
         //Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
-
+        SharedPreferences sharedPreferences=this.getActivity().getSharedPreferences(SHARED_PREFS,Context.MODE_PRIVATE);
+        String name=sharedPreferences.getString("username","");
+        String code=sharedPreferences.getString("groupcode","");
         //set task
-        TextView tv_task = (TextView) v.findViewById(R.id.tv_task);
 
+        readTasks(code,name);
         if(0 == 0)
         {
-            String text = "No new tasks";
-            tv_task.setText(text);
+            //Integer text = tasks.size();
+            //tv_task.setText(tasker);
             //return v;
         }
         //we need only the first one
@@ -72,7 +90,35 @@ public class FragmentGrid extends Fragment {
         GridDataPrepare();
         return v;
     }
+    public void readTasks(final String code1,final String name1){
 
+        mReferenceTasks.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                tasks.clear();
+                List<String> keys=new ArrayList<>();
+                for(DataSnapshot keyNode : dataSnapshot.getChildren()){
+                    keys.add(keyNode.getKey());
+                    Fire_Task task = keyNode.getValue(Fire_Task.class);
+                    if(task.getGROUP().equals(code1)==true) {
+                        tasks.add(task.getTASK());
+                        TextView tv_task2 = (TextView) getActivity().findViewById(R.id.tv_task);
+                        String text = tasks.get(0);
+                        tv_task2.setText(text);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+    }
     private void GridDataPrepare() {
         gridDataList.add("\u2615");
         gridDataList.add("1");
