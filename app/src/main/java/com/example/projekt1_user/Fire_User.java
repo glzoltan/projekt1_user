@@ -11,5 +11,6 @@ public class Fire_User {
 
     public String getNAME() {
         return NAME;
+
     }
 }
