@@ -11,7 +11,6 @@ public class Fire_Vote {
         this.ID = ID;
         this.TASK = TASK;
         this.GROUP=GROUP;
-        this.WHAT = WHAT;
         this.NAME = NAME;
         this.WHAT = WHAT;
     }

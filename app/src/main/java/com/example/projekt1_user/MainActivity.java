@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor=sharedPreferences.edit();
                     editor.putString("groupcode",code);
                     editor.putString("username",name);
-
                     editor.apply();
                     startActivity(intent);
                 }

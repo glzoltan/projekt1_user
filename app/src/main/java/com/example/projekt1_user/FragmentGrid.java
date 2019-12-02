@@ -69,12 +69,7 @@ public class FragmentGrid extends Fragment {
         //set task
 
         readTasks(code,name);
-        if(0 == 0)
-        {
-            //Integer text = tasks.size();
-            //tv_task.setText(tasker);
-            //return v;
-        }
+
         //we need only the first one
         //res.moveToNext();
         //String task = res.getString(0);
@@ -100,13 +95,43 @@ public class FragmentGrid extends Fragment {
                 for(DataSnapshot keyNode : dataSnapshot.getChildren()){
                     keys.add(keyNode.getKey());
                     Fire_Task task = keyNode.getValue(Fire_Task.class);
-                    if(task.getGROUP().equals(code1)==true) {
+                    if(task.getGROUP().equals(code1)==true && task.getSTATUS().equals("activ")==true) {
                         tasks.add(task.getTASK());
-                        TextView tv_task2 = (TextView) getActivity().findViewById(R.id.tv_task);
-                        String text = tasks.get(0);
-                        tv_task2.setText(text);
+
                     }
                 }
+                mReferenceTasks2.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        tasks2.clear();
+                        List<String> keys=new ArrayList<>();
+                        for(DataSnapshot keyNode : dataSnapshot.getChildren()){
+                            keys.add(keyNode.getKey());
+                            Fire_Vote vote = keyNode.getValue(Fire_Vote.class);
+                            if(vote.getGROUP().equals(code1)==true && vote.getNAME().equals(name1)==true) {
+                                tasks2.add(vote.getTASK());
+
+                            }
+                        }
+                        tasks.removeAll(tasks2);
+                        TextView tv_task2 = (TextView) getActivity().findViewById(R.id.tv_task);
+                        if(tasks.isEmpty()==true){
+                            tv_task2.setText("No new task!");
+                        }
+                        else {
+                            String text = tasks.get(0);
+                            tv_task2.setText(text);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
 
             }
 
